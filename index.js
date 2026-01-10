@@ -1,14 +1,29 @@
 const express = require("express");
+const path = require("path");
 const mongoose = require("mongoose");
 const shortid = require("shortid"); 
 const URL = require("./models/url");
 
 const app = express();
+
+app.set("view engine", "ejs");
+app.set("views", path.resolve("./views"));
 app.use(express.json());
 
 mongoose.connect("mongodb://127.0.0.1:27017/short-url-app")
     .then(() => console.log(" MongoDB Connected"))
     .catch((err) => console.log(" DB Error", err));
+
+// ROUTE 4
+app.get("/test", async (req, res) => {
+    // 1. Get all URLs from DB
+    const allUrls = await URL.find({});
+    
+    // 2. Render the 'home.ejs' file and inject the 'urls' data
+    res.render("home", {
+        urls: allUrls, 
+    });
+});
 
 //route1
 app.post("/url", async (req, res) => {
@@ -60,6 +75,7 @@ app.get('/analytics/:shortId', async (req, res) => {
         analytics: result.visitHistory 
     });
 });
+
 
     if (entry) {
         res.redirect(entry.redirectURL);
